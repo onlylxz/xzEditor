@@ -58,71 +58,80 @@
 </head>
 
 <body>
-  <demo-nav title="wangEditor catalog"></demo-nav>
-  <div class="page-container">
-    <div class="page-left">
-      <demo-menu></demo-menu>
+<demo-nav title="wangEditor catalog"></demo-nav>
+<div class="page-container">
+  <div class="page-left">
+    <demo-menu></demo-menu>
+  </div>
+  <div class="page-right" style="display: flex;">
+    <!-- 编辑器 DOM -->
+    <div style="border: 1px solid #ccc; flex: 1; width: calc(100vw - 370px);">
+      <div id="editor-toolbar" style="border-bottom: 1px solid #ccc;"></div>
+      <div id="editor-text-area" style="height: 600px"></div>
     </div>
-    <div class="page-right" style="display: flex;">
-      <!-- 编辑器 DOM -->
-      <div style="border: 1px solid #ccc; flex: 1; width: calc(100vw - 370px);">
-        <div id="editor-toolbar" style="border-bottom: 1px solid #ccc;"></div>
-        <div id="editor-text-area" style="height: 600px"></div>
-      </div>
 
-      <!-- 标题目录 -->
-      <div style="width: 200px; background-color: #f1f1f1;">
-        <ul id="header-container"></ul>
-      </div>
+    <!-- 标题目录 -->
+    <div style="width: 200px; background-color: #f1f1f1;">
+      <ul id="header-container"></ul>
     </div>
   </div>
 
-  <!-- <script src="https://cdn.jsdelivr.net/npm/@wangeditor/editor@latest/dist/index.min.js"></script> -->
-  <script src="https://unpkg.com/@wangeditor/editor@latest/dist/index.js"></script>
-  <script>
-    const E = window.wangEditor
+  <!-- 显示内容 -->
 
-    // 切换语言
-    const LANG = location.href.indexOf('lang=en') > 0 ? 'en' : 'zh-CN'
-    E.i18nChangeLanguage(LANG)
+</div>
+<div id="editor-content-view" class="editor-content-view"></div>
 
-    // 标题 DOM 容器
-    const headerContainer = document.getElementById('header-container')
-    headerContainer.addEventListener('mousedown', event => {
-      if (event.target.tagName !== 'LI') return
-      event.preventDefault()
-      const id = event.target.id
-      editor.scrollToElem(id) // 滚动到标题
-    })
+<!-- <script src="https://cdn.jsdelivr.net/npm/@wangeditor/editor@latest/dist/index.min.js"></script> -->
+<script src="https://unpkg.com/@wangeditor/editor@latest/dist/index.js"></script>
+<script>
+  const E = window.wangEditor
 
-    window.editor = E.createEditor({
-      selector: '#editor-text-area',
-      html: '<h1>标题</h1><h2>标题A</h2><p>文本</p><p>文本</p><p>文本</p><h3>标题A1</h3><p>文本</p><p>文本</p><p>文本</p><h3>标题A2</h3><p>文本</p><p>文本</p><p>文本</p><h2>标题B</h2><p>文本</p><p>文本</p><p>文本</p><h3>标题B1</h3><p>文本</p><p>文本</p><p>文本</p><h3>标题B2</h3><p>文本</p><p>文本</p><p>文本</p>',
-      config: {
-        placeholder: 'Type here...',
-        MENU_CONF: {
-          uploadImage: {
-            fieldName: 'your-fileName',
-            base64LimitSize: 10 * 1024 * 1024 // 10M 以下插入 base64
-          }
-        },
-        onChange(editor) {
-          const headers = editor.getElemsByTypePrefix('header')
-          headerContainer.innerHTML = headers.map(header => {
-            const text = E.SlateNode.string(header)
-            const { id, type } = header
-            return `<li id="${id}" type="${type}">${text}</li>`
-          }).join('')
+  // 切换语言
+  const LANG = location.href.indexOf('lang=en') > 0 ? 'en' : 'zh-CN'
+  E.i18nChangeLanguage(LANG)
+
+  // 标题 DOM 容器
+  const headerContainer = document.getElementById('header-container')
+  headerContainer.addEventListener('mousedown', event => {
+    if (event.target.tagName !== 'LI') return
+    event.preventDefault()
+    const id = event.target.id
+    editor.scrollToElem(id) // 滚动到标题
+  })
+
+  window.editor = E.createEditor({
+    selector: '#editor-text-area',
+    html: '<h1>标题</h1><h2>标题A</h2><p>文本</p><p>文本</p><p>文本</p><h3>标题A1</h3><p>文本</p><p>文本</p><p>文本</p><h3>标题A2</h3><p>文本</p><p>文本</p><p>文本</p><h2>标题B</h2><p>文本</p><p>文本</p><p>文本</p><h3>标题B1</h3><p>文本</p><p>文本</p><p>文本</p><h3>标题B2</h3><p>文本</p><p>文本</p><p>文本</p>',
+    config: {
+      placeholder: 'Type here...',
+      MENU_CONF: {
+        uploadImage: {
+          fieldName: 'your-fileName',
+          base64LimitSize: 10 * 1024 * 1024 // 10M 以下插入 base64
         }
-      }
-    })
+      },
+      onChange(editor) {
+        console.log('children',editor.children)
+        const headers = editor.getElemsByTypePrefix('header')
+        console.log('headers',headers)
+        headerContainer.innerHTML = headers.map(header => {
+          const text = E.SlateNode.string(header)
+          const { id, type } = header
+          return `<li id="${id}" type="${type}">${text}</li>`
+        }).join('')
 
-    window.toolbar = E.createToolbar({
-      editor,
-      selector: '#editor-toolbar',
-      config: {}
-    })
-  </script>
+        const html = editor.getHtml()
+        document.getElementById('editor-content-view').innerHTML = html
+      }
+    }
+  })
+
+  window.toolbar = E.createToolbar({
+    editor,
+    selector: '#editor-toolbar',
+    config: {}
+  })
+</script>
 </body>
 
 </html>
